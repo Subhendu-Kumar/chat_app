@@ -92,7 +92,7 @@ const Signin = () => {
       />
       <Card className="w-96 h-auto bg-zinc-50">
         <CardHeader>
-          <CardTitle>Signin to Chat App</CardTitle>
+          <CardTitle>Signin to RelayChat</CardTitle>
           <CardDescription>
             This action will sign you in to the chat app
           </CardDescription>

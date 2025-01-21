@@ -193,119 +193,40 @@ export const createGroupChat = async (req, res) => {
   }
 };
 
-export const renameGroupChat = async (req, res) => {
-  const { chat_name, chat_id } = req.body;
-  if (!chat_name || !chat_id) {
-    return res
-      .status(400)
-      .json({ message: "Chat name and chat ID are required." });
+export const updateGroupChat = async (req, res) => {
+  const { chat_id, chat_name, users } = req.body;
+  if (!chat_id || !chat_name || !users) {
+    return res.status(400).json({ message: "All feilds are required." });
   }
   try {
-    const chat = await Chat.findOne({ _id: chat_id });
+    const chat = await Chat.findById(chat_id);
     if (!chat) {
-      return res.status(400).json({ message: "no such group chat is present" });
+      return res.status(404).json({ message: "Group chat not found." });
     }
     const isAdmin = chat.group_admin.toString() === req.user.id;
     if (!isAdmin) {
-      return res.status(400).json({
-        message:
-          "you are not admin, so you don't have access to change group name",
+      return res.status(403).json({
+        message: "You are not the admin of this group.",
       });
     }
-    const updatedChat = await Chat.findByIdAndUpdate(
-      chat_id,
-      { chat_name },
-      { new: true }
-    )
-      .populate("users", "-password")
-      .populate("group_admin", "-password");
-    res
-      .status(200)
-      .json({ message: "chat name updated successfully", updatedChat });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "internal server error" });
-  }
-};
-
-export const addGroupMember = async (req, res) => {
-  const { chat_id, user_id } = req.body;
-  if (!user_id || !chat_id) {
-    return res
-      .status(400)
-      .json({ message: "user ID and chat ID are required." });
-  }
-  try {
-    const chat = await Chat.findOne({ _id: chat_id });
-    if (!chat) {
-      return res.status(400).json({ message: "no such group chat is present" });
-    }
-    const isAdmin = chat.group_admin.toString() === req.user.id;
-    if (!isAdmin) {
+    chat.chat_name = chat_name;
+    if (!Array.isArray(users) || users.length < 2) {
       return res.status(400).json({
-        message:
-          "you are not admin, so you don't have access to change group name",
+        message: "Users must be an array with at least 2 members.",
       });
     }
-    const isExists = chat.users.some((user) => user.toString() === user_id);
-    if (isExists) {
-      return res
-        .status(400)
-        .json({ message: "User is already a member of the group." });
-    }
-    const updatedChat = await Chat.findByIdAndUpdate(
-      chat_id,
-      { $push: { users: user_id } },
-      { new: true }
-    )
+    users.push(req.user.id);
+    chat.users = users;
+    const updatedChat = await chat.save();
+    const populatedChat = await Chat.findById(updatedChat._id)
       .populate("users", "-password")
       .populate("group_admin", "-password");
-    res
-      .status(200)
-      .json({ message: "chat name updated successfully", updatedChat });
+    res.status(200).json({
+      message: "Group updated successfully",
+      chat: populatedChat,
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "internal server error" });
-  }
-};
-
-export const removeGroupMember = async (req, res) => {
-  const { chat_id, user_id } = req.body;
-  if (!user_id || !chat_id) {
-    return res
-      .status(400)
-      .json({ message: "user ID and chat ID are required." });
-  }
-  try {
-    const chat = await Chat.findOne({ _id: chat_id });
-    if (!chat) {
-      return res.status(400).json({ message: "no such group chat is present" });
-    }
-    const isAdmin = chat.group_admin.toString() === req.user.id;
-    if (!isAdmin) {
-      return res.status(400).json({
-        message:
-          "you are not admin, so you don't have access to change group name",
-      });
-    }
-    const isExists = chat.users.some((user) => user.toString() === user_id);
-    if (!isExists) {
-      return res
-        .status(400)
-        .json({ message: "User is not a member of the group." });
-    }
-    const updatedChat = await Chat.findByIdAndUpdate(
-      chat_id,
-      { $pull: { users: user_id } },
-      { new: true }
-    )
-      .populate("users", "-password")
-      .populate("group_admin", "-password");
-    res
-      .status(200)
-      .json({ message: "chat name updated successfully", updatedChat });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };

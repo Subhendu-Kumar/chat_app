@@ -86,7 +86,7 @@ const Signup = () => {
       />
       <Card className="w-96 h-auto bg-zinc-50">
         <CardHeader>
-          <CardTitle>Signup to Chat App</CardTitle>
+          <CardTitle>Signup to RelayChat</CardTitle>
           <CardDescription>
             This action will sign you up for the chat app
           </CardDescription>

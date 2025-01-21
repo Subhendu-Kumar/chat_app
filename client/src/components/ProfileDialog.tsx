@@ -17,7 +17,7 @@ const ProfileDialog = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-96 h-auto">
+      <DialogContent className="w-96 h-auto rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-xl">My profile</DialogTitle>
         </DialogHeader>

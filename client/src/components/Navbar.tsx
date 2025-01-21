@@ -25,7 +25,10 @@ const Navbar = () => {
         user={user!}
       />
       <SearchSheet />
-      <p className="text-xl font-semibold font-serif select-none">RelayChat</p>
+      <div className="text-xl font-semibold font-serif select-none flex items-center justify-center gap-2">
+        <img src="./logo.svg" alt="logo" className="w-10 h-10" />
+        <span>RelayChat</span>
+      </div>
       <div className="w-40 h-auto flex items-center justify-end gap-3">
         <Menubar className="border-none bg-transparent p-0 m-0 shadow-none">
           <MenubarMenu>

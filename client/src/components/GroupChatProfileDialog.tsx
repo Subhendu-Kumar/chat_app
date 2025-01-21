@@ -12,28 +12,35 @@ import { FaCheck } from "react-icons/fa";
 import { Skeleton } from "./ui/skeleton";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { GroupForm, UserData } from "@/types";
+import { GroupForm, User, UserData } from "@/types";
 import { useAuth } from "@/context/AuthContext";
-import { createGroup, searchUsers } from "@/api";
+import { searchUsers, updateGroup } from "@/api";
 
-const CreateGroupChatDialog = ({
+const GroupChatProfileDialog = ({
   open,
+  users,
+  chat_name,
   onOpenChange,
 }: {
   open: boolean;
+  users: User[];
+  chat_name: string;
   onOpenChange: (open: boolean) => void;
 }) => {
+  const { user } = useAuth();
+  const userIds =
+    users.filter((u: User) => u._id !== user?.id).map((u: User) => u._id) ?? [];
   const { toast } = useToast();
-  const { setChats, setReload } = useAuth();
+  const { setSelectedChat, selectedChat, setReload } = useAuth();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [fetching, setFetching] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [userNotFoundMsg, SetUserNotFoundMsg] = useState<string>("");
-  const [fetchedUsers, setFetchedUsers] = useState<UserData[] | []>([]);
+  const [fetchedUsers, setFetchedUsers] = useState<UserData[] | []>(users);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
   const [groupForm, setGroupForm] = useState<GroupForm>({
-    chat_name: "",
-    users: [],
+    chat_name: chat_name,
+    users: userIds,
   });
 
   useEffect(() => {
@@ -68,7 +75,7 @@ const CreateGroupChatDialog = ({
     try {
       const res = await searchUsers(query);
       if (res.status === 200) {
-        setFetchedUsers(res.data.users);
+        setFetchedUsers([...res.data.users, ...users]);
       }
       if (res.status === 202) {
         SetUserNotFoundMsg(res.data.message);
@@ -84,28 +91,30 @@ const CreateGroupChatDialog = ({
   const handleSumit = async () => {
     setSubmitting(true);
     try {
-      const res = await createGroup(groupForm.chat_name, groupForm.users);
+      const res = await updateGroup(
+        selectedChat!._id,
+        groupForm.chat_name,
+        groupForm.users
+      );
       if (res.status === 200) {
-        setChats(res.data.chat);
+        setSelectedChat(res.data.chat);
         onOpenChange(false);
-      } else {
-        toast({
-          title: "Error",
-          description:
-            "Someting went wrong! make sure select more then 2 users.",
-        });
+        setReload(true);
       }
     } catch (error) {
       console.log(error);
       toast({
         title: "Error",
-        description: "Someting went wrong! make sure select more then 2 users.",
+        description: "Someting went wrong!",
       });
     } finally {
       setSubmitting(false);
-      setReload(true);
     }
   };
+
+  const uniqueUserArray = fetchedUsers.filter(
+    (item, index, self) => index === self.findIndex((t) => t._id === item._id)
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -134,59 +143,57 @@ const CreateGroupChatDialog = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        {searchTerm && (
-          <div className="w-full h-40 overflow-y-scroll flex flex-col items-start justify-start gap-3">
-            {fetching ? (
-              Array.from({ length: 3 }).map((_, idx) => {
-                return (
-                  <Skeleton
-                    key={idx}
-                    className="w-full h-8 bg-zinc-100 border border-gray-200"
-                  />
-                );
-              })
-            ) : userNotFoundMsg ? (
-              <div className="w-full h-full flex items-center justify-center text-xl font-medium text-red-500">
-                {userNotFoundMsg}
-              </div>
-            ) : (
-              fetchedUsers.map((user, idx) => {
-                return (
-                  <div
-                    key={idx}
-                    onClick={() => handleUserClick(user._id!)}
-                    className="w-full h-auto p-1 flex items-center cursor-pointer justify-between bg-zinc-100 hover:bg-purple-100 transition-all duration-300 ease-in-out border border-gray-200 rounded-md"
-                  >
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="w-6 h-6 rounded-full flex bg-green-400 items-center justify-center overflow-hidden">
-                        {groupForm.users.includes(user._id!) ? (
-                          <FaCheck className="text-sm text-white" />
-                        ) : (
-                          <img
-                            src={user.avatar}
-                            alt="logo"
-                            className="w-full h-full object-cover object-center"
-                          />
-                        )}
-                      </div>
-                      <div className="flex flex-col items-start justify-start">
-                        <p className="text-sm font-medium text-gray-700 capitalize">
-                          {user.name}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          Email: {user.email}
-                        </p>
-                      </div>
+        <div className="w-full h-40 overflow-y-scroll flex flex-col items-start justify-start gap-3">
+          {fetching ? (
+            Array.from({ length: 3 }).map((_, idx) => {
+              return (
+                <Skeleton
+                  key={idx}
+                  className="w-full h-8 bg-zinc-100 border border-gray-200"
+                />
+              );
+            })
+          ) : userNotFoundMsg ? (
+            <div className="w-full h-full flex items-center justify-center text-xl font-medium text-red-500">
+              {userNotFoundMsg}
+            </div>
+          ) : (
+            uniqueUserArray.map((user, idx) => {
+              return (
+                <div
+                  key={idx}
+                  onClick={() => handleUserClick(user._id!)}
+                  className="w-full h-auto p-1 flex items-center cursor-pointer justify-between bg-zinc-100 hover:bg-purple-100 transition-all duration-300 ease-in-out border border-gray-200 rounded-md"
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-6 h-6 rounded-full flex bg-green-400 items-center justify-center overflow-hidden">
+                      {groupForm.users.includes(user._id!) ? (
+                        <FaCheck className="text-sm text-white" />
+                      ) : (
+                        <img
+                          src={user.avatar}
+                          alt="logo"
+                          className="w-full h-full object-cover object-center"
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-col items-start justify-start">
+                      <p className="text-sm font-medium text-gray-700 capitalize">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Email: {user.email}
+                      </p>
                     </div>
                   </div>
-                );
-              })
-            )}
-          </div>
-        )}
+                </div>
+              );
+            })
+          )}
+        </div>
         <DialogFooter>
           <Button onClick={handleSumit}>
-            {submitting ? "Saving data" : "Create group"}
+            {submitting ? "Saving data" : "Save changes"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -194,4 +201,4 @@ const CreateGroupChatDialog = ({
   );
 };
 
-export default CreateGroupChatDialog;
+export default GroupChatProfileDialog;

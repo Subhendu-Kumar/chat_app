@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --radius: 0.5re;
+    --radius: 0.5rem;
     --ring: 0 0% 3.9%;
     --card: 0 0% 100%;
     --primary: 0 0% 9%;

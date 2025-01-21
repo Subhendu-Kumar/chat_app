@@ -68,3 +68,20 @@ export const createGroup = async (chat_name: string, users: string[]) => {
     throw new Error(error instanceof Error ? error.message : String(error));
   }
 };
+
+export const updateGroup = async (
+  chat_id: string,
+  chat_name: string,
+  users: string[]
+) => {
+  try {
+    const response = await API.put("/chat/group/update", {
+      chat_id,
+      chat_name,
+      users,
+    });
+    return response;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
+};
