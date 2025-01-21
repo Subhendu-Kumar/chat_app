@@ -79,10 +79,12 @@ export const searchUsers = async (req, res) => {
     };
     try {
       const userId = req.user && req.user.id;
-      const users = await User.find(keyword).find({ _id: { $ne: userId } });
+      const users = await User.find(keyword)
+        .find({ _id: { $ne: userId } })
+        .select("-__v -createdAt -updatedAt -password");
       if (users.length === 0) {
-        return res.json({
-          message: "No users found matching the search criteria",
+        return res.status(202).json({
+          message: "No users found matching the search term",
         });
       }
       res.status(200).json({ message: "users fetched", users });
@@ -131,7 +133,9 @@ export const accessChat = async (req, res) => {
         "users",
         "-password"
       );
-      res.status(200).json({ message: "chat created successfully", fullChat });
+      res
+        .status(200)
+        .json({ message: "chat created successfully", chat: fullChat });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "internal server error" });

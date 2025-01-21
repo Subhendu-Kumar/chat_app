@@ -1,18 +1,23 @@
-import { AuthContextProps } from "@/types";
-import { clearUserData, getToken, setToken } from "@/lib/utils";
+import { AuthContextProps, Chat, UserData } from "@/types";
 import { createContext, useContext, useEffect, useState } from "react";
+import { clearUserData, getToken, getUserData, setToken } from "@/lib/utils";
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
     const token = getToken();
+    const data = getUserData();
     setIsAuthenticated(!!token);
+    setUser(data);
     setLoading(false);
-  }, []);
+  }, [isAuthenticated]);
 
   const login = (token: string) => {
     setToken(token);
@@ -25,7 +30,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+        user,
+        selectedChat,
+        setSelectedChat,
+        chats,
+        setChats,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

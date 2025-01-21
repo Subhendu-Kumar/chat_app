@@ -57,6 +57,7 @@
 
     --radius: 0.5rem
   }
+
   .dark {
 
     --background: 0 0% 3.9%;
@@ -113,7 +114,44 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Style the scrollbar container */
+::-webkit-scrollbar {
+  width: 4px;
+  /* Width for vertical scrollbar */
+  height: 4px;
+  /* Height for horizontal scrollbar */
+}
+
+/* Style the scrollbar track (background) */
+::-webkit-scrollbar-track {
+  background: transparent;
+  /* Light gray background */
+  border-radius: 6px;
+  /* Rounded corners */
+}
+
+/* Style the scrollbar thumb (scroll handle) */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Darker gray */
+  border-radius: 6px;
+  /* Rounded corners */
+}
+
+/* Style the scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Even darker gray when hovered */
+}
+
+/* Style the scrollbar corner (where horizontal and vertical scrollbars meet, if applicable) */
+::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+  /* Matches the track background */
 }

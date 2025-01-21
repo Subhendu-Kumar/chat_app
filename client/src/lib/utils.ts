@@ -12,6 +12,19 @@ export const setUserData = (data: UserData): void => {
   localStorage.setItem(USER_DATA_KEY, JSON.stringify(data));
 };
 
+export const getUserData = (): UserData | null => {
+  try {
+    const data = localStorage.getItem(USER_DATA_KEY);
+    if (!data) {
+      return null;
+    }
+    return JSON.parse(data) as UserData;
+  } catch (error) {
+    console.error("Failed to parse user data from localStorage:", error);
+    return null;
+  }
+};
+
 export const setToken = (token: string): void => {
   localStorage.setItem(TOKEN_KEY, token);
 };
