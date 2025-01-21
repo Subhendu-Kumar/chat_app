@@ -100,6 +100,11 @@ const GroupChatProfileDialog = ({
         setSelectedChat(res.data.chat);
         onOpenChange(false);
         setReload(true);
+      } else {
+        toast({
+          title: "Error",
+          description: "Someting went wrong!",
+        });
       }
     } catch (error) {
       console.log(error);

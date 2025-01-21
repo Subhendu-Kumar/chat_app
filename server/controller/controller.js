@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
+import { Message } from "../models/message.model.js";
 
 export const signIn = async (req, res) => {
   const { email, password } = req.body;
@@ -225,6 +226,74 @@ export const updateGroupChat = async (req, res) => {
       message: "Group updated successfully",
       chat: populatedChat,
     });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const sendMessage = async (req, res) => {
+  const { content, chat_id } = req.body;
+  if (!content || !chat_id) {
+    return res.status(400).json({ message: "invalid data passed to req" });
+  }
+  const newMessage = {
+    sender: req.user.id,
+    content,
+    chat: chat_id,
+  };
+  try {
+    const chat = await Chat.findById(chat_id);
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found." });
+    }
+    const isMember = chat.users.some((user) => user.toString() === req.user.id);
+    if (!isMember) {
+      return res.status(403).json({
+        message: "You are not a member of this chat.",
+      });
+    }
+    let message = await Message.create(newMessage);
+    await Chat.findByIdAndUpdate(chat_id, { latest_message: message._id });
+    message = await Message.findById(message._id)
+      .populate("sender", "-password")
+      .populate({
+        path: "chat",
+        populate: [
+          {
+            path: "users",
+            select: "-password",
+          },
+          {
+            path: "group_admin",
+            select: "-password",
+          },
+          {
+            path: "latest_message",
+            populate: {
+              path: "sender",
+              select: "-password",
+            },
+          },
+        ],
+      });
+    res.status(200).json({ message, msg: "Message sent successfully." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const fetchMessage = async (req, res) => {
+  const { chat_id } = req.params;
+  if (!chat_id) {
+    return res.status(400).json({ message: "Chat id not provided" });
+  }
+  try {
+    const messages = await Message.find({ chat: chat_id })
+      .populate("sender", "-password")
+      .populate("chat");
+    res.status(200).json({ messages, mes: "messages fetched successfully" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
