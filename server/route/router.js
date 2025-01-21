@@ -1,4 +1,3 @@
-import express from "express";
 import {
   signIn,
   signUp,
@@ -10,15 +9,14 @@ import {
   createGroupChat,
   removeGroupMember,
 } from "../controller/controller.js";
+import express from "express";
 import verifyToken from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
 router.post("/signin", signIn);
 router.post("/signup", signUp);
-
 router.get("/users", verifyToken, searchUsers);
-
 router.get("/chat/fetch", verifyToken, fetchChat);
 router.post("/chat/access", verifyToken, accessChat);
 router.put("/chat/group/add", verifyToken, addGroupMember);

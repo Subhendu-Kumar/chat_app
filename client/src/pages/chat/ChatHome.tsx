@@ -1,6 +1,6 @@
+import Navbar from "@/components/Navbar";
 import ChatSidebar from "@/components/ChatSidebar";
 import MainChatPage from "@/components/MainChatPage";
-import Navbar from "@/components/Navbar";
 
 const ChatHome = () => {
   return (

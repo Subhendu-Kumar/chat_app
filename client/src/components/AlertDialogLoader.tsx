@@ -9,12 +9,12 @@ import savingLogo from "../../public/saving.gif";
 
 const AlertDialogLoader = ({
   open,
-  onOpenChange,
   title,
+  onOpenChange,
 }: {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
   title: string;
+  onOpenChange: (open: boolean) => void;
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

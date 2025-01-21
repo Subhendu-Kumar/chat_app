@@ -1,17 +1,17 @@
-import { useAuth } from "@/context/AuthContext";
-import SearchSheet from "./SearchSheet";
-import { FaBell } from "react-icons/fa";
 import {
   Menubar,
-  MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
   MenubarTrigger,
+  MenubarContent,
+  MenubarShortcut,
+  MenubarSeparator,
 } from "@/components/ui/menubar";
 import { useState } from "react";
+import { FaBell } from "react-icons/fa";
+import SearchSheet from "./SearchSheet";
 import ProfileDialog from "./ProfileDialog";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const { user, logout } = useAuth();

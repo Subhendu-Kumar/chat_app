@@ -59,3 +59,12 @@ export const fetchAllChat = async () => {
     throw new Error(error instanceof Error ? error.message : String(error));
   }
 };
+
+export const createGroup = async (chat_name: string, users: string[]) => {
+  try {
+    const response = await API.post("/chat/group/create", { chat_name, users });
+    return response;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
+};

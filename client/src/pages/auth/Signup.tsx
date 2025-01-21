@@ -19,14 +19,14 @@ import AlertDialogLoader from "@/components/AlertDialogLoader";
 const Signup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formState, setFormState] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

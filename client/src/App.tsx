@@ -14,35 +14,35 @@ function App() {
   const { isAuthenticated } = useAuth();
 
   return (
-      <Router>
-        <Routes>
-          <Route
-            path=""
-            element={
-              isAuthenticated ? (
-                <Navigate to="/chats" />
-              ) : (
-                <Navigate to="/auth/signin" />
-              )
-            }
-          />
-          <Route
-            path="/auth/signin"
-            element={isAuthenticated ? <Navigate to="/chats" /> : <Signin />}
-          />
-          <Route
-            path="/auth/signup"
-            element={isAuthenticated ? <Navigate to="/chats" /> : <Signup />}
-          />
-          <Route
-            path="/chats"
-            element={
-              isAuthenticated ? <ChatHome /> : <Navigate to="/auth/signin" />
-            }
-          />
-        </Routes>
-        <Toaster />
-      </Router>
+    <Router>
+      <Routes>
+        <Route
+          path=""
+          element={
+            isAuthenticated ? (
+              <Navigate to="/chats" />
+            ) : (
+              <Navigate to="/auth/signin" />
+            )
+          }
+        />
+        <Route
+          path="/auth/signin"
+          element={isAuthenticated ? <Navigate to="/chats" /> : <Signin />}
+        />
+        <Route
+          path="/auth/signup"
+          element={isAuthenticated ? <Navigate to="/chats" /> : <Signup />}
+        />
+        <Route
+          path="/chats"
+          element={
+            isAuthenticated ? <ChatHome /> : <Navigate to="/auth/signin" />
+          }
+        />
+      </Routes>
+      <Toaster />
+    </Router>
   );
 }
 

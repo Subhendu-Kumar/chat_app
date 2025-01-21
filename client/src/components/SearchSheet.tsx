@@ -8,24 +8,24 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "./ui/input";
 import { UserData } from "@/types";
-import { accessChat, searchUsers } from "@/api";
 import { Skeleton } from "./ui/skeleton";
 import { useEffect, useState } from "react";
-import { AiOutlineLoading3Quarters, AiOutlineSearch } from "react-icons/ai";
-import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { accessChat, searchUsers } from "@/api";
+import { useAuth } from "@/context/AuthContext";
+import { AiOutlineLoading3Quarters, AiOutlineSearch } from "react-icons/ai";
 
 const SearchSheet = () => {
+  const { toast } = useToast();
   const { setSelectedChat, selectedChat, setReload, chats, setChats } =
     useAuth();
-  const { toast } = useToast();
+  const [open, onOpenChange] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [fetching, setFetching] = useState<boolean>(false);
+  const [fetchingChat, setFetchingChat] = useState<boolean>(false);
   const [userNotFoundMsg, SetUserNotFoundMsg] = useState<string>("");
   const [fetchedUsers, setFetchedUsers] = useState<UserData[] | []>([]);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
-  const [fetchingChat, setFetchingChat] = useState<boolean>(false);
-  const [open, onOpenChange] = useState<boolean>(false);
   const [userIdofChatWhichIsFecthing, setUserIdofChatWhichIsFecthing] =
     useState<string | undefined>("");
 

@@ -23,12 +23,12 @@ const Signin = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formState, setFormState] = useState({
     email: "",
     password: "",
   });
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

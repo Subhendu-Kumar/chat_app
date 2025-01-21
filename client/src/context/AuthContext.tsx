@@ -5,12 +5,12 @@ import { clearUserData, getToken, getUserData, setToken } from "@/lib/utils";
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [reload, setReload] = useState<boolean>(false);
-  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
+  const [reload, setReload] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const token = getToken();
@@ -33,17 +33,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated,
-        loading,
-        login,
-        logout,
         user,
+        login,
+        chats,
+        logout,
         reload,
+        loading,
+        setChats,
         setReload,
         selectedChat,
         setSelectedChat,
-        chats,
-        setChats,
+        isAuthenticated,
       }}
     >
       {children}

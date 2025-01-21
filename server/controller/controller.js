@@ -186,7 +186,7 @@ export const createGroupChat = async (req, res) => {
       .populate("group_admin", "-password");
     res
       .status(200)
-      .json({ message: "group created successfully", fullGroupChat });
+      .json({ message: "group created successfully", chat: fullGroupChat });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "internal server error" });
