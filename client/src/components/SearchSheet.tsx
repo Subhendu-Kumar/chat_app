@@ -16,7 +16,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const SearchSheet = () => {
-  const { setSelectedChat, selectedChat, chats, setChats } = useAuth();
+  const { setSelectedChat, selectedChat, setReload, chats, setChats } =
+    useAuth();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [fetching, setFetching] = useState<boolean>(false);
@@ -64,6 +65,7 @@ const SearchSheet = () => {
   const handleAccessChat = async (userId: string | undefined) => {
     setUserIdofChatWhichIsFecthing(userId);
     setFetchingChat(true);
+    setReload(false);
     try {
       const res = await accessChat(userId);
       if (res.status === 200) {
@@ -71,6 +73,7 @@ const SearchSheet = () => {
           setChats([res.data.chat, ...chats]);
         }
         setSelectedChat(res.data.chat);
+        setReload(true);
         onOpenChange(false);
       }
     } catch (error) {

@@ -5,7 +5,8 @@ import { Button } from "./ui/button";
 import { FaPlus } from "react-icons/fa";
 
 const ChatSidebar = () => {
-  const { selectedChat, setSelectedChat, chats, setChats, user } = useAuth();
+  const { selectedChat, setSelectedChat, reload, chats, setChats, user } =
+    useAuth();
   const loggedInUserId = user?.id;
 
   useEffect(() => {
@@ -20,7 +21,7 @@ const ChatSidebar = () => {
       }
     };
     fetchChats();
-  }, []);
+  }, [setChats, reload]);
 
   return (
     <div className="w-[25%] h-full bg-zinc-50 border-r border-gray-200 p-4">

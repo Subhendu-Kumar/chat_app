@@ -9,6 +9,8 @@ export interface AuthContextProps {
   isAuthenticated: boolean;
   loading: boolean;
   login: (token: string) => void;
+  reload: boolean;
+  setReload: (reload: boolean) => void;
   logout: () => void;
   user: UserData | null;
   selectedChat: Chat | null;
