@@ -1,6 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { Message, User } from "@/types";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProfileDialog from "./ProfileDialog";
 import { IoMdMenu } from "react-icons/io";
 import { BsEmojiHeartEyes } from "react-icons/bs";
@@ -18,6 +18,9 @@ import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { messageFetch, messageSend } from "@/api";
+import io from "socket.io-client";
+
+const END_POINT = "http://localhost:5000";
 
 const MainChatPage = () => {
   const { toast } = useToast();
@@ -39,9 +42,14 @@ const MainChatPage = () => {
   const [newMessage, setNewMessage] = useState<string>("");
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [messageSent, setMessageSent] = useState<boolean>(false);
+  const [socketConnected, setSocketConnected] = useState<boolean>(false);
+  const [typing, setTyping] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const [fetchedMessages, setFetchedMessages] = useState<Message[] | []>([]);
 
-  console.log("messages:", fetchedMessages);
+  const socket = io(END_POINT);
+  const selectedChatCompare = selectedChat;
+  console.log(isTyping);
 
   const sendMessage = async () => {
     if (!newMessage.trim()) {
@@ -54,9 +62,11 @@ const MainChatPage = () => {
     setSendingMessage(true);
     setMessageSent(false);
     setNewMessage("");
+    socket.emit("stop_typing", selectedChat!._id);
     try {
       const res = await messageSend(newMessage, selectedChat!._id);
       if (res.status === 200) {
+        socket.emit("new_message", res.data.message);
         setFetchedMessages([...fetchedMessages, res.data.message]);
         setMessageSent(true);
         setTimeout(() => setMessageSent(false), 2000);
@@ -94,6 +104,7 @@ const MainChatPage = () => {
       const res = await messageFetch(selectedChat!._id);
       if (res.status === 200) {
         setFetchedMessages(res.data.messages);
+        socket.emit("join_chat", selectedChat._id);
       } else {
         toast({
           title: "Error",
@@ -113,9 +124,55 @@ const MainChatPage = () => {
     }
   };
 
+  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    if (!socketConnected) {
+      return;
+    }
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat!._id);
+    }
+    const lastTypingTime = new Date().getTime();
+    setTimeout(() => {
+      const currentTime = new Date().getTime();
+      const timeDiff = currentTime - lastTypingTime;
+      if (timeDiff >= 2000 && typing) {
+        socket.emit("stop_typing", selectedChat!._id);
+        setTyping(false);
+      }
+    }, 2000);
+  };
+
   useEffect(() => {
     fetchMessages();
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.emit("setup", user);
+    socket.on("connected", () => {
+      setSocketConnected(true);
+    });
+    socket.on("typing", () => {
+      setIsTyping(true);
+    });
+    socket.on("stop_typing", () => {
+      setIsTyping(false);
+    });
+  });
+
+  useEffect(() => {
+    socket.on("message_recived", (newMessageRecived) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageRecived.chat._id
+      ) {
+        //give notification
+      } else {
+        setFetchedMessages([...fetchedMessages, newMessageRecived]);
+      }
+    });
+  });
 
   return (
     <div className="w-[75%] h-full">
@@ -215,7 +272,7 @@ const MainChatPage = () => {
             onKeyDown={handleKeyDown}
             placeholder="Enter your message"
             className="w-[calc(100%-120px)] shadow-none"
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={(e) => handleTyping(e)}
           />
           <button
             onClick={sendMessage}
