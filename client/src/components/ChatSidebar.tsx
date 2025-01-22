@@ -27,7 +27,7 @@ const ChatSidebar = () => {
   }, [setChats, reload]);
 
   return (
-    <div className="w-[25%] h-full bg-zinc-50 border-r border-gray-200 p-4">
+    <div className="w-[25%] h-full border-r border-gray-200 p-4">
       <CreateGroupChatDialog
         open={openCreateGroupDialog}
         onOpenChange={setOpenCreateGroupDialog}

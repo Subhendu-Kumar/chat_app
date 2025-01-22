@@ -85,3 +85,21 @@ export const updateGroup = async (
     throw new Error(error instanceof Error ? error.message : String(error));
   }
 };
+
+export const messageSend = async (content: string, chat_id: string) => {
+  try {
+    const response = await API.post("/chat/message/send", { content, chat_id });
+    return response;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
+};
+
+export const messageFetch = async (chat_id: string) => {
+  try {
+    const response = await API.get(`/chat/message/fetch/${chat_id}`);
+    return response;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
+};

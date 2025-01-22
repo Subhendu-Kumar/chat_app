@@ -255,28 +255,7 @@ export const sendMessage = async (req, res) => {
     }
     let message = await Message.create(newMessage);
     await Chat.findByIdAndUpdate(chat_id, { latest_message: message._id });
-    message = await Message.findById(message._id)
-      .populate("sender", "-password")
-      .populate({
-        path: "chat",
-        populate: [
-          {
-            path: "users",
-            select: "-password",
-          },
-          {
-            path: "group_admin",
-            select: "-password",
-          },
-          {
-            path: "latest_message",
-            populate: {
-              path: "sender",
-              select: "-password",
-            },
-          },
-        ],
-      });
+    message = await populateMessage(Message.findById(message._id));
     res.status(200).json({ message, msg: "Message sent successfully." });
   } catch (error) {
     console.log(error);
@@ -290,12 +269,28 @@ export const fetchMessage = async (req, res) => {
     return res.status(400).json({ message: "Chat id not provided" });
   }
   try {
-    const messages = await Message.find({ chat: chat_id })
-      .populate("sender", "-password")
-      .populate("chat");
+    const messages = await populateMessage(Message.find({ chat: chat_id }));
     res.status(200).json({ messages, mes: "messages fetched successfully" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+const populateMessage = (query) =>
+  query.populate("sender", "-password").populate({
+    path: "chat",
+    populate: [
+      {
+        path: "users",
+        select: "-password",
+      },
+      {
+        path: "group_admin",
+        select: "-password",
+      },
+      {
+        path: "latest_message",
+      },
+    ],
+  });

@@ -51,3 +51,34 @@ export interface GroupForm {
   users: string[];
   chat_name: string;
 }
+
+interface LatestMessage {
+  _id: string;
+  sender: string;
+  content: string;
+  chat: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface Chat2 {
+  _id: string;
+  chat_name: string;
+  is_group_chat: boolean;
+  users: User[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  latest_message: LatestMessage;
+}
+
+export interface Message {
+  _id: string;
+  sender: User;
+  content: string;
+  chat: Chat2;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
