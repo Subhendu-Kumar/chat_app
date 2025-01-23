@@ -4,7 +4,6 @@ import {
   MenubarMenu,
   MenubarTrigger,
   MenubarContent,
-  MenubarShortcut,
   MenubarSeparator,
 } from "@/components/ui/menubar";
 import { useState } from "react";
@@ -14,7 +13,8 @@ import ProfileDialog from "./ProfileDialog";
 import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, notification, setNotification, setSelectedChat } =
+    useAuth();
   const [showProfile, setShowProfile] = useState<boolean>(false);
 
   return (
@@ -36,14 +36,32 @@ const Navbar = () => {
               <FaBell className="text-2xl" />
             </MenubarTrigger>
             <MenubarContent align="end">
-              <MenubarItem>
-                New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem>New Window</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Share</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Print</MenubarItem>
+              {notification.length === 0 ? (
+                <>
+                  <MenubarItem>No notifications</MenubarItem>
+                  <MenubarSeparator />
+                </>
+              ) : (
+                notification.map((noti, idx) => {
+                  return (
+                    <div key={idx}>
+                      <MenubarItem
+                        onClick={() => {
+                          setSelectedChat(noti.chat);
+                          setNotification(
+                            notification.filter((n) => n !== noti)
+                          );
+                        }}
+                      >
+                        {noti.chat.is_group_chat
+                          ? `New message in ${noti.chat.chat_name}`
+                          : `New message from ${noti.sender.name}`}
+                      </MenubarItem>
+                      <MenubarSeparator />
+                    </div>
+                  );
+                })
+              )}
             </MenubarContent>
           </MenubarMenu>
           <MenubarMenu>

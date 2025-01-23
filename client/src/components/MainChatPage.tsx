@@ -19,12 +19,11 @@ import { useToast } from "@/hooks/use-toast";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { messageFetch, messageSend } from "@/api";
 import io from "socket.io-client";
-
-const END_POINT = "http://localhost:5000";
+import { END_POINT } from "@/config";
 
 const MainChatPage = () => {
   const { toast } = useToast();
-  const { selectedChat, user } = useAuth();
+  const { selectedChat, user, notification, setNotification } = useAuth();
   const filteredUser = selectedChat?.users.filter(
     (u: User) => u._id !== user?.id
   );
@@ -167,7 +166,9 @@ const MainChatPage = () => {
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageRecived.chat._id
       ) {
-        //give notification
+        if (!notification.includes(newMessageRecived)) {
+          setNotification([newMessageRecived, ...notification]);
+        }
       } else {
         setFetchedMessages([...fetchedMessages, newMessageRecived]);
       }

@@ -11,12 +11,14 @@ export interface AuthContextProps {
   loading: boolean;
   logout: () => void;
   user: UserData | null;
+  notification: Message[];
   isAuthenticated: boolean;
   selectedChat: Chat | null;
   login: (token: string) => void;
   setChats: (chats: Chat[]) => void;
   setReload: (reload: boolean) => void;
   setSelectedChat: (selectedChat: Chat | null) => void;
+  setNotification: (Notification: Message[] | []) => void;
 }
 
 export interface UserData {

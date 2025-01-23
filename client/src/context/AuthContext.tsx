@@ -1,4 +1,4 @@
-import { AuthContextProps, Chat, UserData } from "@/types";
+import { AuthContextProps, Chat, Message, UserData } from "@/types";
 import { createContext, useContext, useEffect, useState } from "react";
 import { clearUserData, getToken, getUserData, setToken } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserData | null>(null);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [notification, setNotification] = useState<Message[] | []>([]);
 
   useEffect(() => {
     const token = getToken();
@@ -42,6 +43,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setChats,
         setReload,
         selectedChat,
+        notification,
+        setNotification,
         setSelectedChat,
         isAuthenticated,
       }}
